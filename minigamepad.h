@@ -1869,7 +1869,7 @@ void mg_osx_input_value_changed_callback(void *context, IOReturn result, void *s
             if (btn == 0)
                 break;
 
-			mg_handle_button_event(events, bnt, MG_BOOL(intValue) gamepad);
+			mg_handle_button_event(&gamepads->events, btn, MG_BOOL(intValue), gamepad);
             break;
 		}
 		case kHIDPage_GenericDesktop: {
@@ -1885,7 +1885,7 @@ void mg_osx_input_value_changed_callback(void *context, IOReturn result, void *s
 			if (intValue < logicalMin) intValue = logicalMin;
 			if (intValue > logicalMax) intValue = logicalMax;
 
-			mg_handle_axis_event(events, btn, (-1.0f + ((intValue - logicalMin) * 2.0f) / (float)(logicalMax - logicalMin)), gamepad);
+			mg_handle_axis_event(&gamepads->events, btn, (-1.0f + ((intValue - logicalMin) * 2.0f) / (float)(logicalMax - logicalMin)), gamepad);
         }
 	}
 }
@@ -2023,7 +2023,7 @@ void mg_osx_device_removed_callback(void *context, IOReturn result, void *sender
 
     for (cur = gamepads->list.head; cur; cur = cur->next) {
         if (cur->src.device == device) {
-			mg_handle_connection_event(&gamepads->events, MG_FALSE, gamepad);
+			mg_handle_connection_event(&gamepads->events, MG_FALSE, cur);
 			mg_gamepad_release(gamepads, cur);
             return;
         }
@@ -2067,8 +2067,8 @@ void mg_gamepads_init_platform(mg_gamepads* gamepads) {
 
 }
 
-mg_bool mg_gamepads_update_platform(mg_gamepads* gamepads, mg_event* event) {
-    MG_UNUSED(gamepads); MG_UNUSED(event);
+mg_bool mg_gamepads_update_platform(mg_gamepads* gamepads, mg_events* events) {
+    MG_UNUSED(gamepads); MG_UNUSED(events);
     return MG_FALSE;
 }
 
@@ -2077,7 +2077,7 @@ void mg_gamepads_free_platform(mg_gamepads* gamepads) {
 }
 
 mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
-    MG_UNUSED(gamepad); MG_UNUSED(event);
+    MG_UNUSED(gamepad); MG_UNUSED(events);
     return MG_FALSE;
 }
 
