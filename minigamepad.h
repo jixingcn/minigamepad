@@ -390,6 +390,7 @@ typedef struct mg_gamepads_src {
 #elif defined(MG_MACOS)
 typedef struct mg_gamepads_src {
     IOHIDManagerRef hidManager;
+	void* events;
 } mg_gamepads_src;
 #elif defined(MG_WASM)
 typedef struct mg_gamepads_src {
@@ -1869,7 +1870,7 @@ void mg_osx_input_value_changed_callback(void *context, IOReturn result, void *s
             if (btn == 0)
                 break;
 
-			mg_handle_button_event(&gamepads->events, btn, MG_BOOL(intValue), gamepad);
+			mg_handle_button_event((mg_events*)gamepad->src.events, btn, MG_BOOL(intValue), gamepad);
             break;
 		}
 		case kHIDPage_GenericDesktop: {
@@ -1885,7 +1886,7 @@ void mg_osx_input_value_changed_callback(void *context, IOReturn result, void *s
 			if (intValue < logicalMin) intValue = logicalMin;
 			if (intValue > logicalMax) intValue = logicalMax;
 
-			mg_handle_axis_event(&gamepads->events, btn, (-1.0f + ((intValue - logicalMin) * 2.0f) / (float)(logicalMax - logicalMin)), gamepad);
+			mg_handle_axis_event((mg_events*)gamepad->src.events, btn, (-1.0f + ((intValue - logicalMin) * 2.0f) / (float)(logicalMax - logicalMin)), gamepad);
         }
 	}
 }
@@ -2003,6 +2004,7 @@ void mg_osx_device_added_callback(void* context, IOReturn result, void *sender, 
         }
     }
 
+	gamepad->src.events = (void*)&gamepads->src.events;
 	mg_handle_connection_event(&gamepads->events, MG_TRUE, gamepad);
     CFRelease(elements);
 }
@@ -2077,8 +2079,8 @@ void mg_gamepads_free_platform(mg_gamepads* gamepads) {
 }
 
 mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
-    MG_UNUSED(gamepad); MG_UNUSED(events);
-    return MG_FALSE;
+	gamepad->src.events = (void*)events;
+	return MG_FALSE;
 }
 
 
