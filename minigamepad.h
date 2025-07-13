@@ -2004,7 +2004,7 @@ void mg_osx_device_added_callback(void* context, IOReturn result, void *sender, 
         }
     }
 
-	gamepad->src.events = (void*)&gamepads->src.events;
+	gamepad->src.events = (void*)&gamepads->events;
 	mg_handle_connection_event(&gamepads->events, MG_TRUE, gamepad);
     CFRelease(elements);
 }
