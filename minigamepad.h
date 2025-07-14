@@ -383,7 +383,7 @@ typedef struct mg_gamepads_src {
 } mg_gamepads_src;
 #elif defined(MG_MACOS)
 typedef struct mg_gamepads_src {
-    IOHIDManagerRef hidManager;
+    void* hidManager;
 } mg_gamepads_src;
 #elif defined(MG_WASM)
 typedef struct mg_gamepads_src {
@@ -1863,7 +1863,7 @@ void mg_osx_input_value_changed_callback(void *context, IOReturn result, void *s
 	CFIndex intValue = IOHIDValueGetIntegerValue(value);
     MG_UNUSED(result); MG_UNUSED(sender);
 
-    if ((IDirectInputDevice8*)gamepad->src.device != device)
+    if ((IDirectInputDevice8)gamepad->src.device != device)
         return;
 
     switch (usagePage) {
@@ -2028,7 +2028,7 @@ void mg_osx_device_removed_callback(void *context, IOReturn result, void *sender
 	}
 
     for (cur = gamepads->list.head; cur; cur = cur->next) {
-        if ((IDirectInputDevice8*)cur->src.device == device) {
+        if ((IDirectInputDevice8)cur->src.device == device) {
 			mg_handle_connection_event(&gamepads->events, MG_FALSE, cur);
 			mg_gamepad_release(gamepads, cur);
             return;
@@ -2040,7 +2040,7 @@ void mg_gamepads_init_platform(mg_gamepads* gamepads) {
     const int filter[] = {kHIDPage_GenericDesktop};
 
     CFMutableDictionaryRef matchingDictionary;
-    gamepads->src.hidManager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    gamepads->src.hidManager = (void*)IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
 
     matchingDictionary = CFDictionaryCreateMutable(
 		kCFAllocatorDefault,
@@ -2049,7 +2049,7 @@ void mg_gamepads_init_platform(mg_gamepads* gamepads) {
 		&kCFTypeDictionaryValueCallBacks
 	);
 	if (!matchingDictionary) {
-		CFRelease(gamepads->src.hidManager);
+		CFRelease((IOHIDManagerRef)gamepads->src.hidManager);
 		return;
 	}
 
@@ -2059,14 +2059,14 @@ void mg_gamepads_init_platform(mg_gamepads* gamepads) {
 		CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, filter)
 	);
 
-	IOHIDManagerSetDeviceMatching(gamepads->src.hidManager, matchingDictionary);
+	IOHIDManagerSetDeviceMatching((IOHIDManagerRef)gamepads->src.hidManager, matchingDictionary);
 
-	IOHIDManagerRegisterDeviceMatchingCallback(gamepads->src.hidManager, mg_osx_device_added_callback, gamepads);
-	IOHIDManagerRegisterDeviceRemovalCallback(gamepads->src.hidManager, mg_osx_device_removed_callback, gamepads);
+	IOHIDManagerRegisterDeviceMatchingCallback((IOHIDManagerRef)gamepads->src.hidManager, mg_osx_device_added_callback, gamepads);
+	IOHIDManagerRegisterDeviceRemovalCallback((IOHIDManagerRef)gamepads->src.hidManager, mg_osx_device_removed_callback, gamepads);
 
-	IOHIDManagerScheduleWithRunLoop(gamepads->src.hidManager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+	IOHIDManagerScheduleWithRunLoop((IOHIDManagerRef)gamepads->src.hidManager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 
-	IOHIDManagerOpen(gamepads->src.hidManager, kIOHIDOptionsTypeNone);
+	IOHIDManagerOpen((IOHIDManagerRef)gamepads->src.hidManager, kIOHIDOptionsTypeNone);
 
 	/* Execute the run loop once in order to register any initially-attached joysticks */
 	CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, false);
@@ -2079,7 +2079,7 @@ mg_bool mg_gamepads_update_platform(mg_gamepads* gamepads, mg_events* events) {
 }
 
 void mg_gamepads_free_platform(mg_gamepads* gamepads) {
-	CFRelease(gamepads->src.hidManager);
+	CFRelease((IOHIDManagerRef)gamepads->src.hidManager);
 }
 
 mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
