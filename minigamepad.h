@@ -1863,7 +1863,7 @@ void mg_osx_input_value_changed_callback(void *context, IOReturn result, void *s
 	CFIndex intValue = IOHIDValueGetIntegerValue(value);
     MG_UNUSED(result); MG_UNUSED(sender);
 
-    if ((IDirectInputDevice8)gamepad->src.device != device)
+    if ((IOHIDDeviceRef)gamepad->src.device != device)
         return;
 
     switch (usagePage) {
@@ -2028,7 +2028,7 @@ void mg_osx_device_removed_callback(void *context, IOReturn result, void *sender
 	}
 
     for (cur = gamepads->list.head; cur; cur = cur->next) {
-        if ((IDirectInputDevice8)cur->src.device == device) {
+        if ((IOHIDDeviceRef)cur->src.device == device) {
 			mg_handle_connection_event(&gamepads->events, MG_FALSE, cur);
 			mg_gamepad_release(gamepads, cur);
             return;
