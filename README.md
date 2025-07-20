@@ -11,22 +11,7 @@ A simple, cross platform lightweight single-header gamepad library for handling 
 
 Written with support for C89, using overridable C99 features, eg. `stdint.h` and `inline` with `#define MG_C89`.
 
-## progress / TODO 
-### linux (evdev)
-full support except for rumble 
-
-### windows
-#### directinput 
-backend is started, but not complete. 
-
-#### xinput  
-backend is started, but not complete. 
-
-### macos (iokit)
-backend is started, but not complete. 
-
-### wasm (emscripten)
-backend has not been started 
+Note: this projct is early in development so there are some things missing and bugs to be worked out.
 
 ## basic example
 
@@ -40,7 +25,7 @@ int main(void) {
     mg_gamepad* cur;
 
     mg_gamepads_init(&gamepads);
-    
+
     while (mg_gamepads_update(&gamepads, NULL));
 
     for (cur = gamepads.list.head; cur; cur = cur->next) {
@@ -57,5 +42,5 @@ Then compile with:
 linux `gcc main.c` \
 macos: `gcc main.c -framework IOKit -framework CoreFoundation` \
 windows: `gcc main.c` OR `cl main.c` \
-wasm: `emcc main.c -s ASYNCIFY`  
+wasm: `emcc main.c -s ASYNCIFY`
 
