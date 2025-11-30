@@ -46,7 +46,7 @@ int main(void) {
 	mg_gamepads_init(&gamepads);
 
     while (gamepads.list.head) {
-        while (mg_gamepads_update(&gamepads, NULL));
+        mg_gamepads_poll(&gamepads);
     }
 
     mg_gamepads_free(&gamepads);

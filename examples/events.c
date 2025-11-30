@@ -6,10 +6,10 @@
 int main(void) {
     mg_gamepads gamepads;
     mg_gamepads_init(&gamepads);
-    
+
     while (gamepads.list.head) {
         mg_event ev;
-        while (mg_gamepads_update(&gamepads, &ev)) {
+        while (mg_gamepads_check_event(&gamepads, &ev)) {
             switch (ev.type) {
                 case MG_EVENT_BUTTON_PRESS:
                     printf("button press (gamepad %p) %i\n", (void*)ev.gamepad, ev.button);
