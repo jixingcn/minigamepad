@@ -2081,6 +2081,7 @@ mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
         memcpy(&axes_state, &state, sizeof(axes_state));
 
 		for (i = 0; i < 6; i++) {
+			float value;
 			mg_axis key = mg_get_gamepad_axis(gamepad, (u8)i);
             if (key == MG_AXIS_UNKNOWN) {
                 key = mg_get_gamepad_axis_platform(i);
@@ -2090,7 +2091,7 @@ mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
 			/* NOTE: this doesn't work with triggers because triggers are combined into one input
 			 * TODO: fix this (or just use xinput)
 			 * */
-			float value = (((float)axes_state[i] + 0.5f) / 32767.5f) - 1.0f;
+			value = (((float)axes_state[i] + 0.5f) / 32767.5f) - 1.0f;
 			mg_handle_axis_event(events, key, value, gamepad);
         }
 
@@ -2098,8 +2099,8 @@ mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
             DWORD pov = state.rgdwPOV[0];
 
 			if (pov != 0xFFFF) {
-				float angle = pov / (45 * DI_DEGREES);
-				int x = 0, y = 0;
+				float angle = (float)pov / (45.0f * DI_DEGREES);
+				i32 x = 0, y = 0;
 
 				switch ((u32)angle) {
 					case 0: /* up */       x = 0;  y = -1; break;
@@ -2117,8 +2118,8 @@ mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
 				mg_handle_button_event(events, MG_BUTTON_DPAD_UP, y < 0, gamepad);
 				mg_handle_button_event(events, MG_BUTTON_DPAD_DOWN, y > 0, gamepad);
 			} else {
-				//mg_handle_axis_event(events, MG_AXIS_HAT_DPAD_LEFT_RIGHT, (float)0.0f, gamepad);
-				//mg_handle_axis_event(events, MG_AXIS_HAT_DPAD_UP_DOWN, (float)0.0f, gamepad);
+				mg_handle_axis_event(events, MG_AXIS_HAT_DPAD_LEFT_RIGHT, (float)0.0f, gamepad);
+				mg_handle_axis_event(events, MG_AXIS_HAT_DPAD_UP_DOWN, (float)0.0f, gamepad);
             }
         }
     }
