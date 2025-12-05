@@ -32,10 +32,10 @@ int main(void) {
     clear();
 
     for (;;) {
-        while(mg_gamepads_update(&gamepads, NULL));
+        mg_gamepads_poll(&gamepads);
 
         /* This is not best practice!
-            Checking if the controller is disconnected is not the only way you should check if you need to refresh the controller list! However, better ways of doing it are a bit complex and out of the scope of this example. */ 
+            Checking if the controller is disconnected is not the only way you should check if you need to refresh the controller list! However, better ways of doing it are a bit complex and out of the scope of this example. */
         if (!gamepad->connected) {
             clear();
 
@@ -58,7 +58,7 @@ int main(void) {
         }
 
         for (axis = 0; axis < MG_AXIS_COUNT; axis++) {
-            if (gamepad->axes[axis].supported == MG_FALSE) 
+            if (gamepad->axes[axis].supported == MG_FALSE)
                 continue;
 
             printf("     %25s:\t", mg_axis_get_name(axis));
@@ -66,7 +66,7 @@ int main(void) {
         }
         printf("\33[0;0H");
     }
-    
+
     printf("all controllers have been disconnected\n");
     mg_gamepads_free(&gamepads);
     return 0;
