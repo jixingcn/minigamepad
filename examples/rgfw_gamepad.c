@@ -23,6 +23,9 @@ typedef struct my_rect { i32 x, y, w, h; } my_rect;
 
 void drawGamepad(RGFW_window* w, mg_gamepad* gamepad);
 
+#define RT_IMPLEMENTATION
+#include "deps/rtime.h"
+
 int main(void) {
 	RGFW_window* win = RGFW_createWindow("RGFW Example Window", 0, 0, 800, 450, RGFW_windowCenter | RGFW_windowOpenGL);
     RGFW_window_setExitKey(win, RGFW_escape);
@@ -33,10 +36,20 @@ int main(void) {
     mg_gamepads_init(&gamepads);
     mg_gamepad* gamepad = gamepads.list.head;
 
+	float t1 = rt_getTime();
+	size_t frames = 0;
+
 	while (RGFW_window_shouldClose(win) == RGFW_FALSE) {
         mg_gamepads_poll(&gamepads);
 		if (gamepad == NULL) {
 			gamepad = gamepads.list.head;
+		}
+
+		float t2 = (float)rt_getTime();
+		if (t2 - t1 >= 1.0 && RGFW_isKeyDown(RGFW_space)) {
+			printf("FPS %f\n", (frames / (t2 - t1)));
+			frames = 0;
+			t1 = t2;
 		}
 
         RGFW_event event;
@@ -82,6 +95,7 @@ int main(void) {
         }
 
 		RGFW_window_swapBuffers_OpenGL(win);
+		frames++;
     }
 
     RGFW_window_close(win);
