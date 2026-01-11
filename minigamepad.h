@@ -729,7 +729,6 @@ mg_gamepad_axis_func mg_set_gamepad_axis_callback(mg_gamepad_axis_func func) {
 
 void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_axis axis, mg_bool state, float value, mg_gamepad* gamepad) {
 	mg_event event;
-	event.type = type;
 	event.gamepad = gamepad;
 	event.axis = axis;
 	event.button = btn;
@@ -739,10 +738,10 @@ void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_ax
 		case MG_EVENT_GAMEPAD_DISCONNECT:
 			if (state) {
 				type = MG_EVENT_GAMEPAD_CONNECT;
-				if (mg_gamepad_disconnected_callback) mg_gamepad_disconnected_callback(gamepad, state);
+				if (mg_gamepad_connected_callback) mg_gamepad_connected_callback(gamepad, state);
 			} else {
 				type = MG_EVENT_GAMEPAD_DISCONNECT;
-				if (mg_gamepad_connected_callback) mg_gamepad_connected_callback(gamepad, state);
+				if (mg_gamepad_disconnected_callback) mg_gamepad_disconnected_callback(gamepad, state);
 			}
 			break;
 		case MG_EVENT_BUTTON_PRESS:
@@ -778,6 +777,7 @@ void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_ax
 		return;
 	}
 
+	event.type = type;
 	events->len += 1;
 	events->queue[MG_MAX_EVENTS - events->len] = event;
 }
