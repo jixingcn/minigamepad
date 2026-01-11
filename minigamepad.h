@@ -2062,7 +2062,7 @@ mg_bool mg_gamepad_update_platform(mg_gamepad* gamepad, mg_events* events) {
         IDirectInputDevice8_Poll((IDirectInputDevice8*)gamepad->src.device);
         result = IDirectInputDevice8_GetDeviceState((IDirectInputDevice8*)gamepad->src.device, sizeof(state), &state);
         if (result == DIERR_NOTACQUIRED || result == DIERR_INPUTLOST) {
-            IDirectInputDevice7_Acquire((IDirectInputDevice8*)gamepad->src.device);
+            IDirectInputDevice8_Acquire((IDirectInputDevice8*)gamepad->src.device);
             IDirectInputDevice8_Poll((IDirectInputDevice8*)gamepad->src.device);
 
             result = IDirectInputDevice8_GetDeviceState((IDirectInputDevice8*)gamepad->src.device, sizeof(state), &state);
