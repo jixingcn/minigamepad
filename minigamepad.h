@@ -2381,6 +2381,7 @@ void mg_gamepads_init_platform(mg_gamepads* gamepads) {
 	);
 
 	IOHIDManagerSetDeviceMatching((IOHIDManagerRef)gamepads->src.hidManager, matchingDictionary);
+  CFRelease(matchingDictionary);
 
 	IOHIDManagerRegisterDeviceMatchingCallback((IOHIDManagerRef)gamepads->src.hidManager, mg_osx_device_added_callback, gamepads);
 	IOHIDManagerRegisterDeviceRemovalCallback((IOHIDManagerRef)gamepads->src.hidManager, mg_osx_device_removed_callback, gamepads);
