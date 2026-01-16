@@ -1755,7 +1755,7 @@ BOOL CALLBACK DirectInputEnumDevicesCallback(LPCDIDEVICEINSTANCE inst, LPVOID us
     return DIENUM_CONTINUE;
 }
 
-#include <Dbt.h>
+#include <dbt.h>
 
 static LRESULT CALLBACK mg_winproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     mg_gamepads* gamepads = (mg_gamepads*)GetPropW(hWnd, L"gamepads");
