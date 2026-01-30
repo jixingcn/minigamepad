@@ -1755,7 +1755,7 @@ BOOL CALLBACK DirectInputEnumDevicesCallback(LPCDIDEVICEINSTANCE inst, LPVOID us
     return DIENUM_CONTINUE;
 }
 
-#include <Dbt.h>
+#include <dbt.h>
 
 static LRESULT CALLBACK mg_winproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     mg_gamepads* gamepads = (mg_gamepads*)GetPropW(hWnd, L"gamepads");
@@ -1856,7 +1856,7 @@ void mg_gamepads_init_platform(mg_gamepads* gamepads) {
 
 	gamepads->src.dummy_win = CreateWindowW(Class.lpszClassName, (wchar_t*)"", 0, 0, 0, 0, 0, 0, 0, hInstance, 0);
 
-	SetPropW(gamepads->src.dummy_win, L"gamepads", gamepads);
+	SetPropW((HWND)gamepads->src.dummy_win, L"gamepads", gamepads);
 }
 
 #ifndef XINPUT_DEVSUBTYPE_FLIGHT_STICK
@@ -1964,7 +1964,7 @@ mg_bool mg_gamepads_poll_platform(mg_gamepads* gamepads, mg_events* events) {
 }
 
 void mg_gamepads_free_platform(mg_gamepads* gamepads) {
-	DestroyWindow(gamepads->src.dummy_win);
+	DestroyWindow((HWND)gamepads->src.dummy_win);
 
 	if (mg_xinput_dll) {
         FreeLibrary(mg_xinput_dll);
