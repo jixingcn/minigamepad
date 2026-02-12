@@ -273,9 +273,9 @@ typedef MG_ENUM(i8, mg_button) {
     MG_BUTTON_GUIDE,			/**< guide button on the controller (e.g. the Xbox button or ps button) */
     MG_BUTTON_START,			/**< start button on the gamepad */
     MG_BUTTON_LEFT_STICK,		/**< left stick button (L3) */
-    MG_BUTTON_RIGHT_STICK,		/**< left shoulder button (R4) */
+    MG_BUTTON_RIGHT_STICK,		/**< right stick button (R4) */
     MG_BUTTON_LEFT_SHOULDER,	/**< left shoulder button (L1) */
-    MG_BUTTON_RIGHT_SHOULDER,	/**< left shoulder button (R1) */
+    MG_BUTTON_RIGHT_SHOULDER,	/**< right shoulder button (R1) */
     MG_BUTTON_DPAD_LEFT,		/**< dpad left button */
     MG_BUTTON_DPAD_RIGHT,		/**< dpad right button */
     MG_BUTTON_DPAD_UP,			/**< dpad up button */
@@ -305,7 +305,7 @@ typedef MG_ENUM(i8, mg_axis) {
     MG_AXIS_LEFT_X, /**< X axis of the left stick */
     MG_AXIS_LEFT_Y, /**< Y axis of the left stick */
     MG_AXIS_RIGHT_X, /**< X axis of the right stick */
-    MG_AXIS_RIGHT_Y, /**< Y axis of the left stick */
+    MG_AXIS_RIGHT_Y, /**< Y axis of the right stick */
     MG_AXIS_LEFT_TRIGGER, /**< Axis of the left triggle (0 - 1) */
     MG_AXIS_RIGHT_TRIGGER, /**< Axis of the right triggle (0 - 1) */
     MG_AXIS_HAT_DPAD_LEFT_RIGHT, /**< d-pad left-right hat value  */
