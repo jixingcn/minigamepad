@@ -718,54 +718,65 @@ float mg_gamepad_axis_value(mg_gamepad* gamepad, mg_axis axis) {
 }
 
 mg_gamepad_connection_func mg_set_gamepad_connected_callback(mg_gamepads* gamepads, mg_gamepad_connection_func func, void* userdata) {
+    mg_gamepad_connection_func prev;
+
     MG_ASSERT(gamepads);
 
-    mg_gamepad_connection_func prev = gamepads->callbacks.connected.callback;
+    prev = gamepads->callbacks.connected.callback;
     gamepads->callbacks.connected.callback = func;
     gamepads->callbacks.connected.userdata = userdata;
     return prev;
 }
 
 mg_gamepad_connection_func mg_set_gamepad_disconnected_callback(mg_gamepads* gamepads, mg_gamepad_connection_func func, void* userdata) {
+    mg_gamepad_connection_func prev;
+
     MG_ASSERT(gamepads);
 
-    mg_gamepad_connection_func prev = gamepads->callbacks.disconnected.callback;
+    prev = gamepads->callbacks.disconnected.callback;
     gamepads->callbacks.disconnected.callback = func;
     gamepads->callbacks.disconnected.userdata = userdata;
     return prev;
 }
 
 mg_gamepad_button_func mg_set_gamepad_press_callback(mg_gamepads* gamepads, mg_gamepad_button_func func, void* userdata) {
+    mg_gamepad_button_func prev;
+
     MG_ASSERT(gamepads);
 
-    mg_gamepad_button_func prev = gamepads->callbacks.press.callback;
+    prev = gamepads->callbacks.press.callback;
     gamepads->callbacks.press.callback = func;
     gamepads->callbacks.press.userdata = userdata;
     return prev;
 }
 
 mg_gamepad_button_func mg_set_gamepad_release_callback(mg_gamepads* gamepads, mg_gamepad_button_func func, void* userdata) {
+    mg_gamepad_button_func prev;
+
     MG_ASSERT(gamepads);
 
-    mg_gamepad_button_func prev = gamepads->callbacks.release.callback;
+    prev = gamepads->callbacks.release.callback;
     gamepads->callbacks.release.callback = func;
     gamepads->callbacks.release.userdata = userdata;
     return prev;
 }
 
 mg_gamepad_axis_func mg_set_gamepad_axis_callback(mg_gamepads* gamepads, mg_gamepad_axis_func func, void* userdata) {
+    mg_gamepad_axis_func prev;
+
     MG_ASSERT(gamepads);
 
-    mg_gamepad_axis_func prev = gamepads->callbacks.axis.callback;
+    prev = gamepads->callbacks.axis.callback;
     gamepads->callbacks.axis.callback = func;
     gamepads->callbacks.axis.userdata = userdata;
     return prev;
 }
 
 void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_axis axis, mg_bool state, float value, mg_gamepad* gamepad) {
+    mg_event event;
+
     MG_ASSERT(gamepad && gamepad->callbacks);
 
-	mg_event event;
 	event.gamepad = gamepad;
 	event.axis = axis;
 	event.button = btn;
@@ -1510,7 +1521,7 @@ mg_axis mg_get_gamepad_axis_platform(u32 axis) {
 #define MG_REF_GUID(g) (g)
 #endif
 
-#include <xinput.h>
+#include <Xinput.h>
 #include <dinput.h>
 
 #ifndef DIDFT_OPTIONAL

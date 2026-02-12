@@ -6,10 +6,10 @@
 void gamepad_connection(mg_gamepad* gamepad, mg_bool connected, void* userdata) {
 	switch (connected) {
 		case MG_FALSE:
-            printf("gamepad disconnected (gamepad %p)\n", (void*)gamepad);
+            printf("gamepad disconnected (gamepad %p) (userdata %p)\n", (void*)gamepad, userdata);
 			break;
 		case MG_TRUE:
-            printf("gamepad connected (gamepad %p)\n", (void*)gamepad);
+            printf("gamepad connected (gamepad %p) (userdata %p)\n", (void*)gamepad, userdata);
 			break;
 		default: break;
 	}
@@ -18,17 +18,17 @@ void gamepad_connection(mg_gamepad* gamepad, mg_bool connected, void* userdata) 
 void gamepad_button(mg_gamepad* gamepad, mg_button button, mg_bool pressed, void* userdata) {
 	switch (pressed) {
 		case MG_FALSE:
-			printf("button release (gamepad %p) %i\n", (void*)gamepad, button);
+			printf("button release (gamepad %p) %i (userdata %p)\n", (void*)gamepad, button, userdata);
 			break;
 		case MG_TRUE:
-			printf("button press (gamepad %p) %i\n", (void*)gamepad, button);
+			printf("button press (gamepad %p) %i (userdata %p)\n", (void*)gamepad, button, userdata);
 			break;
 		default: break;
 	}
 }
 
 void gamepad_axis(mg_gamepad* gamepad, mg_axis axis, void* userdata) {
-    printf("axis move (gamepad %p) %i\n", (void*)gamepad, axis);
+    printf("axis move (gamepad %p) %i (userdata %p)\n", (void*)gamepad, axis, userdata);
 }
 
 
