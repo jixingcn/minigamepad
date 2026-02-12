@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-void gamepad_connection(mg_gamepad* gamepad, mg_bool connected) {
+void gamepad_connection(mg_gamepad* gamepad, mg_bool connected, void* userdata) {
 	switch (connected) {
 		case MG_FALSE:
             printf("gamepad disconnected (gamepad %p)\n", (void*)gamepad);
@@ -15,7 +15,7 @@ void gamepad_connection(mg_gamepad* gamepad, mg_bool connected) {
 	}
 }
 
-void gamepad_button(mg_gamepad* gamepad, mg_button button, mg_bool pressed) {
+void gamepad_button(mg_gamepad* gamepad, mg_button button, mg_bool pressed, void* userdata) {
 	switch (pressed) {
 		case MG_FALSE:
 			printf("button release (gamepad %p) %i\n", (void*)gamepad, button);
@@ -27,7 +27,7 @@ void gamepad_button(mg_gamepad* gamepad, mg_button button, mg_bool pressed) {
 	}
 }
 
-void gamepad_axis(mg_gamepad* gamepad, mg_axis axis) {
+void gamepad_axis(mg_gamepad* gamepad, mg_axis axis, void* userdata) {
     printf("axis move (gamepad %p) %i\n", (void*)gamepad, axis);
 }
 
@@ -35,15 +35,15 @@ void gamepad_axis(mg_gamepad* gamepad, mg_axis axis) {
 
 int main(void) {
 	mg_gamepads gamepads;
-	mg_set_gamepad_connected_callback(gamepad_connection);
-	mg_set_gamepad_disconnected_callback(gamepad_connection);
-
-	mg_set_gamepad_press_callback(gamepad_button);
-	mg_set_gamepad_release_callback(gamepad_button);
-
-	mg_set_gamepad_axis_callback(gamepad_axis);
-
 	mg_gamepads_init(&gamepads);
+
+    mg_set_gamepad_connected_callback(&gamepads, gamepad_connection, NULL);
+	mg_set_gamepad_disconnected_callback(&gamepads, gamepad_connection, NULL);
+
+	mg_set_gamepad_press_callback(&gamepads, gamepad_button, NULL);
+	mg_set_gamepad_release_callback(&gamepads, gamepad_button, NULL);
+
+	mg_set_gamepad_axis_callback(&gamepads, gamepad_axis, NULL);
 
     while (gamepads.list.head) {
         mg_gamepads_poll(&gamepads);

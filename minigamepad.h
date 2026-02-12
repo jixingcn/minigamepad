@@ -237,6 +237,11 @@
 typedef struct mg_gamepads_src mg_gamepads_src;
 
 /**!
+ * @brief global stucture for the data of all the callbacks
+*/
+typedef struct mg_gamepads_callbacks mg_gamepads_callbacks;
+
+/**!
  * @brief global stucture for the data of all the gamepads
 */
 typedef struct mg_gamepads mg_gamepads;
@@ -390,17 +395,17 @@ typedef struct mg_events {
 /**!
  * @brief type for the connection callback function
 */
-typedef void (*mg_gamepad_connection_func)(mg_gamepad* gamepad, mg_bool connected);
+typedef void (*mg_gamepad_connection_func)(mg_gamepad* gamepad, mg_bool connected, void* userdata);
 
 /**!
  * @brief type for the button state callback function
 */
-typedef void (*mg_gamepad_button_func)(mg_gamepad* gamepad, mg_button button, mg_bool pressed);
+typedef void (*mg_gamepad_button_func)(mg_gamepad* gamepad, mg_button button, mg_bool pressed, void* userdata);
 
 /**!
  * @brief type for the axis move callback function
 */
-typedef void (*mg_gamepad_axis_func)(mg_gamepad* gamepad, mg_axis);
+typedef void (*mg_gamepad_axis_func)(mg_gamepad* gamepad, mg_axis, void* userdata);
 
 /**!
  * @brief init gamepads, api and internal data
@@ -490,36 +495,35 @@ MG_API float mg_gamepad_axis_value(mg_gamepad* gamepad, mg_axis axis);
  * @return the original function object in use
 */
 
-MG_API mg_gamepad_connection_func mg_set_gamepad_connected_callback(mg_gamepad_connection_func func);
+MG_API mg_gamepad_connection_func mg_set_gamepad_connected_callback(mg_gamepads* gamepads, mg_gamepad_connection_func func, void* userdata);
 
 /**!
  * @brief set the function object for gamepad release events
  * @param the function object to use
  * @return the original function object in use
 */
-MG_API mg_gamepad_button_func mg_set_gamepad_release_callback(mg_gamepad_button_func func);
+MG_API mg_gamepad_button_func mg_set_gamepad_release_callback(mg_gamepads* gamepads, mg_gamepad_button_func func, void* userdata);
 
 /**!
  * @brief set the function object for gamepad axis movement aevents
  * @param the function object to use
  * @return the current function object in use
 */
-MG_API mg_gamepad_axis_func mg_set_gamepad_axis_callback(mg_gamepad_axis_func func);
+MG_API mg_gamepad_axis_func mg_set_gamepad_axis_callback(mg_gamepads* gamepads, mg_gamepad_axis_func func, void* userdata);
 
 /**!
  * @brief set the gamepad disconnected callback function object
  * @param the function object to use
  * @return the original value of the disconnected callback
 */
-
-MG_API mg_gamepad_connection_func mg_set_gamepad_disconnected_callback(mg_gamepad_connection_func func);
+MG_API mg_gamepad_connection_func mg_set_gamepad_disconnected_callback(mg_gamepads* gamepads, mg_gamepad_connection_func func, void* userdata);
 
 /**!
  * @brief set the gamepad press callbqack function to use
  * @param the function object to use
  * @return the original value of the gamepad press callback
 */
-MG_API mg_gamepad_button_func mg_set_gamepad_press_callback(mg_gamepad_button_func func);
+MG_API mg_gamepad_button_func mg_set_gamepad_press_callback(mg_gamepads* gamepads, mg_gamepad_button_func func, void* userdata);
 
 /* add a new mapping */
 /**!
@@ -605,6 +609,7 @@ struct mg_gamepad {
     struct mg_gamepad* prev;
     struct mg_gamepad* next;
     mg_gamepad_src src;
+    const mg_gamepads_callbacks* callbacks;
 };
 
 #ifdef MG_LINUX
@@ -630,6 +635,29 @@ struct mg_gamepads_src {
 };
 #endif
 
+struct mg_gamepads_callbacks {
+    struct {
+        mg_gamepad_connection_func callback;
+        void*                      userdata;
+    } connected;
+    struct {
+        mg_gamepad_connection_func callback;
+        void*                      userdata;
+    } disconnected;
+    struct {
+        mg_gamepad_axis_func callback;
+        void*                userdata;
+    } axis;
+    struct {
+        mg_gamepad_button_func callback;
+        void*                  userdata;
+    } press;
+    struct {
+        mg_gamepad_button_func callback;
+        void*                  userdata;
+    } release;
+};
+
 struct mg_gamepads {
     mg_gamepad gamepads[MG_MAX_GAMEPADS];
 
@@ -642,6 +670,8 @@ struct mg_gamepads {
 	mg_bool polled_events;
 
     mg_gamepads_src src;
+
+    mg_gamepads_callbacks callbacks;
 };
 
 #endif /* MG_NATIVE */
@@ -687,47 +717,54 @@ float mg_gamepad_axis_value(mg_gamepad* gamepad, mg_axis axis) {
     return gamepad->axes[axis].value;
 }
 
-static mg_gamepad_connection_func mg_gamepad_connected_callback = NULL;
+mg_gamepad_connection_func mg_set_gamepad_connected_callback(mg_gamepads* gamepads, mg_gamepad_connection_func func, void* userdata) {
+    MG_ASSERT(gamepads);
 
-mg_gamepad_connection_func mg_set_gamepad_connected_callback(mg_gamepad_connection_func func) {
-    mg_gamepad_connection_func prev = mg_gamepad_connected_callback;
-    mg_gamepad_connected_callback = func;
+    mg_gamepad_connection_func prev = gamepads->callbacks.connected.callback;
+    gamepads->callbacks.connected.callback = func;
+    gamepads->callbacks.connected.userdata = userdata;
     return prev;
 }
 
-static mg_gamepad_connection_func mg_gamepad_disconnected_callback = NULL;
+mg_gamepad_connection_func mg_set_gamepad_disconnected_callback(mg_gamepads* gamepads, mg_gamepad_connection_func func, void* userdata) {
+    MG_ASSERT(gamepads);
 
-mg_gamepad_connection_func mg_set_gamepad_disconnected_callback(mg_gamepad_connection_func func) {
-    mg_gamepad_connection_func prev = mg_gamepad_disconnected_callback;
-    mg_gamepad_disconnected_callback = func;
+    mg_gamepad_connection_func prev = gamepads->callbacks.disconnected.callback;
+    gamepads->callbacks.disconnected.callback = func;
+    gamepads->callbacks.disconnected.userdata = userdata;
     return prev;
 }
 
-static mg_gamepad_button_func mg_gamepad_press_callback = NULL;
+mg_gamepad_button_func mg_set_gamepad_press_callback(mg_gamepads* gamepads, mg_gamepad_button_func func, void* userdata) {
+    MG_ASSERT(gamepads);
 
-mg_gamepad_button_func mg_set_gamepad_press_callback(mg_gamepad_button_func func) {
-    mg_gamepad_button_func prev = mg_gamepad_press_callback;
-    mg_gamepad_press_callback = func;
+    mg_gamepad_button_func prev = gamepads->callbacks.press.callback;
+    gamepads->callbacks.press.callback = func;
+    gamepads->callbacks.press.userdata = userdata;
     return prev;
 }
 
-static mg_gamepad_button_func mg_gamepad_release_callback = NULL;
-#define mg_release_callback(gamepad, button) if (mg_gamepad_release_callback) mg_gamepad_release_callback(gamepad, button, MG_FALSE)
+mg_gamepad_button_func mg_set_gamepad_release_callback(mg_gamepads* gamepads, mg_gamepad_button_func func, void* userdata) {
+    MG_ASSERT(gamepads);
 
-mg_gamepad_button_func mg_set_gamepad_release_callback(mg_gamepad_button_func func) {
-    mg_gamepad_button_func prev = mg_gamepad_release_callback;
-    mg_gamepad_release_callback = func;
+    mg_gamepad_button_func prev = gamepads->callbacks.release.callback;
+    gamepads->callbacks.release.callback = func;
+    gamepads->callbacks.release.userdata = userdata;
     return prev;
 }
 
-static mg_gamepad_axis_func mg_gamepad_axis_callback = NULL;
-mg_gamepad_axis_func mg_set_gamepad_axis_callback(mg_gamepad_axis_func func) {
-    mg_gamepad_axis_func prev = mg_gamepad_axis_callback;
-    mg_gamepad_axis_callback = func;
+mg_gamepad_axis_func mg_set_gamepad_axis_callback(mg_gamepads* gamepads, mg_gamepad_axis_func func, void* userdata) {
+    MG_ASSERT(gamepads);
+
+    mg_gamepad_axis_func prev = gamepads->callbacks.axis.callback;
+    gamepads->callbacks.axis.callback = func;
+    gamepads->callbacks.axis.userdata = userdata;
     return prev;
 }
 
 void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_axis axis, mg_bool state, float value, mg_gamepad* gamepad) {
+    MG_ASSERT(gamepad && gamepad->callbacks);
+
 	mg_event event;
 	event.gamepad = gamepad;
 	event.axis = axis;
@@ -738,10 +775,10 @@ void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_ax
 		case MG_EVENT_GAMEPAD_DISCONNECT:
 			if (state) {
 				type = MG_EVENT_GAMEPAD_CONNECT;
-				if (mg_gamepad_connected_callback) mg_gamepad_connected_callback(gamepad, state);
+				if (gamepad->callbacks->connected.callback) gamepad->callbacks->connected.callback(gamepad, state, gamepad->callbacks->connected.userdata);
 			} else {
 				type = MG_EVENT_GAMEPAD_DISCONNECT;
-				if (mg_gamepad_disconnected_callback) mg_gamepad_disconnected_callback(gamepad, state);
+				if (gamepad->callbacks->disconnected.callback) gamepad->callbacks->disconnected.callback(gamepad, state, gamepad->callbacks->disconnected.userdata);
 			}
 			break;
 		case MG_EVENT_BUTTON_PRESS:
@@ -754,11 +791,11 @@ void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_ax
 			gamepad->buttons[btn].current = state;
 			if (state) {
 				type = MG_EVENT_BUTTON_PRESS;
-				if (mg_gamepad_press_callback) mg_gamepad_press_callback(gamepad, btn, state);
+				if (gamepad->callbacks->press.callback) gamepad->callbacks->press.callback(gamepad, btn, state, gamepad->callbacks->press.userdata);
 			}
 			else {
 				type = MG_EVENT_BUTTON_RELEASE;
-				if (mg_gamepad_release_callback) mg_gamepad_release_callback(gamepad, btn, state);
+				if (gamepad->callbacks->release.callback) gamepad->callbacks->release.callback(gamepad, btn, state, gamepad->callbacks->release.userdata);
 			}
 			break;
 		case MG_EVENT_AXIS_MOVE:
@@ -767,7 +804,7 @@ void mg_handle_event(mg_events* events, mg_event_type type, mg_button btn, mg_ax
 			}
 
 			gamepad->axes[axis].value = value;
-			if (mg_gamepad_axis_callback) mg_gamepad_axis_callback(gamepad, axis);
+			if (gamepad->callbacks->axis.callback) gamepad->callbacks->axis.callback(gamepad, axis, gamepad->callbacks->axis.userdata);
 			break;
 		default: break;
 	}
@@ -813,6 +850,8 @@ void mg_gamepads_init(mg_gamepads* gamepads) {
                 gamepads->free_list.cur->next = &gamepads->gamepads[i + 1];
                 gamepads->free_list.cur = gamepads->free_list.cur->next;
             }
+
+            gamepads->gamepads[i].callbacks = &gamepads->callbacks;
         }
     }
 
@@ -929,6 +968,7 @@ mg_gamepad* mg_gamepad_find(mg_gamepads* gamepads) {
 
     mg_list_swap_gamepad(&gamepads->free_list, &gamepads->list, gamepad);
     gamepad->index = (mg_size_t)(gamepad - gamepads->gamepads);
+    gamepad->callbacks = &gamepads->callbacks;
     return gamepad;
 }
 
