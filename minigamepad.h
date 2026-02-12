@@ -1268,7 +1268,10 @@ mg_bool mg_gamepads_poll_platform(mg_gamepads* gamepads, mg_events* events) {
             mg_gamepad* cur;
             for (cur = gamepads->list.head; cur != NULL; cur = cur->next) {
                 if (MG_STRNCMP(cur->src.full_path, full_path, sizeof(cur->src.full_path)) == 0) {
-   					mg_handle_connection_event(events, MG_FALSE, cur);
+                    if (MG_TRUE == cur->connected) {
+                        cur->connected = MG_FALSE;
+   					    mg_handle_connection_event(events, MG_FALSE, cur);
+                    }
                     mg_gamepad_release(gamepads, cur);
                     return MG_TRUE;
                 }
@@ -1967,7 +1970,10 @@ void mg_xinput_fetch_gamepads(mg_gamepads* gamepads, mg_events* events) {
 		if (dwResult != ERROR_SUCCESS) {
 			gamepad->src.xinput_index = 0;
 			mg_xinput_list[i] = NULL;
-			mg_handle_connection_event(events, MG_FALSE, gamepad);
+            if (MG_TRUE == gamepad->connected) {
+                gamepad->connected = MG_FALSE;
+			    mg_handle_connection_event(events, MG_FALSE, gamepad);
+            }
 			mg_gamepad_release(gamepads, gamepad);
 
 			continue;
@@ -2404,7 +2410,10 @@ void mg_osx_device_removed_callback(void *context, IOReturn result, void *sender
 
     for (cur = gamepads->list.head; cur; cur = cur->next) {
         if ((IOHIDDeviceRef)cur->src.device == device) {
-			mg_handle_connection_event(&gamepads->events, MG_FALSE, cur);
+            if (MG_TRUE == cur->connected) {
+                cur->connected = MG_FALSE;
+			    mg_handle_connection_event(&gamepads->events, MG_FALSE, cur);
+            }
 			mg_gamepad_release(gamepads, cur);
             return;
         }
