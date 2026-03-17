@@ -34,16 +34,22 @@ void gamepad_axis(mg_gamepad* gamepad, mg_axis axis, void* userdata) {
 
 
 int main(void) {
+	mg_size_t i;
+	mg_gamepad* gamepad;
 	mg_gamepads gamepads;
 	mg_gamepads_init(&gamepads);
 
-    mg_set_gamepad_connected_callback(&gamepads, gamepad_connection, NULL);
-	mg_set_gamepad_disconnected_callback(&gamepads, gamepad_connection, NULL);
+	for (i = 0; i < MG_MAX_GAMEPADS; ++i) {
+		gamepad = &gamepads.gamepads[i];
 
-	mg_set_gamepad_press_callback(&gamepads, gamepad_button, NULL);
-	mg_set_gamepad_release_callback(&gamepads, gamepad_button, NULL);
+		mg_set_gamepad_connected_callback(gamepad, gamepad_connection, NULL);
+		mg_set_gamepad_disconnected_callback(gamepad, gamepad_connection, NULL);
 
-	mg_set_gamepad_axis_callback(&gamepads, gamepad_axis, NULL);
+		mg_set_gamepad_press_callback(gamepad, gamepad_button, NULL);
+		mg_set_gamepad_release_callback(gamepad, gamepad_button, NULL);
+
+		mg_set_gamepad_axis_callback(gamepad, gamepad_axis, NULL);
+	}
 
     while (gamepads.list.head) {
         mg_gamepads_poll(&gamepads);
